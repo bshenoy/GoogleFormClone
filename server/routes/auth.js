@@ -19,8 +19,15 @@ router.post('/google', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+router.get('/check', (req, res) => {
+    if (req.session.userId) {
+        res.json({ authenticated: true, userId: req.session.userId });
+    } else {
+        res.json({ authenticated: false });
+    }
+});
 
-router.get('/user', async (req, res) => {
+router.get('/users/me', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'User not authenticated' });
     }
