@@ -6,11 +6,14 @@ import GoogleLoginButton from './components/Login';
 import PrivateRoute from './components/PrivateRoute';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from './features/auth/authSlice'; // Update this path
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const checkUserSession = async () => {
@@ -19,9 +22,9 @@ const App = () => {
           withCredentials: true
         });
         if (response.data.authenticated) {
-          console.log("the backend reponse check api", response )
-          setUserData(response.data);
+          dispatch(loginSuccess(response.data.responseData)); // Dispatch action to store user data
           setLoggedIn(true);
+          setUserData(response.data.responseData);
           navigate('/form');
         }
       } catch (error) {
@@ -30,7 +33,7 @@ const App = () => {
     };
 
     checkUserSession();
-  }, []);
+  }, [dispatch, navigate]);
 
 
   const handleLoginSuccess = (response) => {
