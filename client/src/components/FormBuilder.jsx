@@ -15,7 +15,6 @@ import {
   Typography
 } from '@mui/material';
 import axios from 'axios';
-import '../index.css';  // Import your CSS file
 
 const formSections = [
   {
@@ -44,87 +43,7 @@ const formSections = [
       { name: 'country', label: 'Country', type: 'text' }
     ]
   },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
-  {
-    title: 'Additional Information',
-    fields: [
-      { name: 'address', label: 'Address', type: 'text' },
-      { name: 'city', label: 'City', type: 'text' },
-      { name: 'state', label: 'State', type: 'text' },
-      { name: 'country', label: 'Country', type: 'text' }
-    ]
-  },
+  // Add more sections as needed
 ];
 
 const FormBuilder = ({ userData }) => {
@@ -150,12 +69,19 @@ const FormBuilder = ({ userData }) => {
     // Fetch user data if the user is already logged in
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('/api/user', { withCredentials: true });
+        const response = await axios.get('http://localhost:5000/api/user', { withCredentials: true });
         const user = response.data.user;
-        setFormData({
-          ...formData,
+        setFormData(prevData => ({
+          ...prevData,
           ...user
-        });
+        }));
+
+        // Fetch saved responses
+        const savedResponses = await axios.get('http://localhost:5000/api/saved_responses', { withCredentials: true });
+        setFormData(prevData => ({
+          ...prevData,
+          ...savedResponses.data
+        }));
       } catch (error) {
         console.error('Error fetching user data:', error);
       }
@@ -176,8 +102,26 @@ const FormBuilder = ({ userData }) => {
     setFileUploads({ ...fileUploads, [name]: files[0] });
   };
 
-  const handleNext = () => {
+  const savePageData = async () => {
+    const pageData = formSections[currentPage].fields.reduce((data, field) => {
+      data[field.name] = formData[field.name];
+      return data;
+    }, {});
+
+    try {
+      await axios.post('http://localhost:5000/api/save_response', {
+        page: `page${currentPage + 1}`, // Adjusted to match backend page naming convention
+        data: pageData
+      }, { withCredentials: true });
+      console.log('Page data saved successfully');
+    } catch (error) {
+      console.error('Error saving page data:', error);
+    }
+  };
+
+  const handleNext = async () => {
     if (validateCurrentPage()) {
+      await savePageData();
       setCurrentPage(currentPage + 1);
     } else {
       alert('Please fill all required fields before proceeding.');
@@ -195,6 +139,7 @@ const FormBuilder = ({ userData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    await savePageData();
     const form = new FormData();
     Object.keys(formData).forEach(key => {
       form.append(key, formData[key]);
@@ -202,10 +147,11 @@ const FormBuilder = ({ userData }) => {
     Object.keys(fileUploads).forEach(key => {
       form.append(key, fileUploads[key]);
     });
- console.log ("form data", formData)
+
     try {
-      const response = await axios.post('/api/forms', form);
+      const response = await axios.post('http://localhost:5000/api/submit_form', form, { withCredentials: true });
       console.log('Form submitted successfully:', response.data);
+      // Optionally, reset form data and navigate to a success page
     } catch (error) {
       console.error('Error submitting form:', error);
     }

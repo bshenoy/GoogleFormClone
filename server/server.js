@@ -21,17 +21,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
-    secret: 'your_secret_key',
+    secret: 'secret56555',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: 'mongodb://localhost:27017/userDb' }),
     cookie: {
-        maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
-        sameSite: 'lax', // Adjust as necessary based on your security requirements
-        secure: false, // Set to true if using HTTPS
+      maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
+      sameSite: 'lax', // Adjust as necessary based on your security requirements
+      secure: false, // Set to true if using HTTPS
     }
-}));
-
+  }));
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/userDb', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))

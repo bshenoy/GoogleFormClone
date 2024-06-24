@@ -19,8 +19,10 @@ const App = () => {
           withCredentials: true
         });
         if (response.data.authenticated) {
-          setUserData(response.data.userId);
+          console.log("the backend reponse check api", response )
+          setUserData(response.data);
           setLoggedIn(true);
+          navigate('/form');
         }
       } catch (error) {
         console.error('No active session', error);
@@ -29,6 +31,7 @@ const App = () => {
 
     checkUserSession();
   }, []);
+
 
   const handleLoginSuccess = (response) => {
     setLoggedIn(true);

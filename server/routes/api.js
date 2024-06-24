@@ -22,14 +22,23 @@ router.post('/save_response', ensureAuth, async (req, res) => {
         if (!response) {
             response = new Response({ userId: req.user._id, responses: {} });
         }
-        response.responses[page] = data;
+        
+        if (page === 'page1') {
+            response.responses.page1 = data;
+        } else if (page === 'page2') {
+            response.responses.page2 = data;
+        } // Add more conditions for other pages as needed
+
+        response.updatedAt = Date.now();
         await response.save();
+        
         res.status(200).json({ message: 'Response saved successfully' });
     } catch (err) {
-        console.error(err); // Logging the error
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
+
 
 router.post('/submit_form', ensureAuth, upload.single('file'), async (req, res) => {
     try {
@@ -48,16 +57,17 @@ router.post('/submit_form', ensureAuth, upload.single('file'), async (req, res) 
 
 router.get('/saved_responses', ensureAuth, async (req, res) => {
     try {
-        const response = await Response.findOne({ userId: req.user._id });
-        if (response) {
-            res.status(200).json(response.responses);
-        } else {
-            res.status(404).json({ message: 'No saved responses found' });
-        }
+        console.log("sample check ", )
+      const response = await Response.findOne({ userId: req.session.userId });
+      if (response) {
+        res.status(200).json(response.responses);
+      } else {
+        res.status(404).json({ message: 'No saved responses found' });
+      }
     } catch (err) {
-        console.error(err); // Logging the error
-        res.status(500).json({ error: err.message });
+      console.error(err); // Logging the error
+      res.status(500).json({ error: err.message });
     }
-});
+  });
 
 module.exports = router;

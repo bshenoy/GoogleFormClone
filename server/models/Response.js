@@ -4,9 +4,18 @@ const responseSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     responses: {
         page1: {
-            name: String,
-            email: String,
-            phone: String,
+            firstName: String,
+            middleName: String,
+            lastName: String,
+            contactNumber: String,
+            alternateContact: String,
+            dob: Date,
+            age: String,
+            gender: String,
+            maritalStatus: String,
+            nationality: String,
+            bloodGroup: String,
+            profilePicture: String, // Assuming you store file path or URL
         },
         page2: {
             aadhar: String,
