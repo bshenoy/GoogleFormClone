@@ -6,7 +6,7 @@ module.exports.ensureAuth = async (req, res, next) => {
       const user = await User.findById(req.session.userId);
       if (user) {
         req.user = user;
-        console.log('User ID found in session:', req.session.userId);
+        // console.log('User ID found in session:', req.session.userId);
         return next();
       } else {
         console.log('User not found in database');

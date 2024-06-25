@@ -8,6 +8,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from './features/auth/authSlice'; // Update this path
+import ThankYouPage from './pages/Thank';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -21,11 +22,24 @@ const App = () => {
         const response = await axios.get('http://localhost:5000/auth/check', {
           withCredentials: true
         });
-        if (response.data.authenticated) {
-          dispatch(loginSuccess(response.data.responseData)); // Dispatch action to store user data
-          setLoggedIn(true);
-          setUserData(response.data.responseData);
-          navigate('/form');
+
+        if (response.data && response.data.authenticated) {
+          if (response.data.responseData) {
+            dispatch(loginSuccess(response.data.responseData)); // Dispatch action to store user data
+          }
+          if (response.data.isSumbitted){
+            console.log("this is being aled- saved")
+            navigate('/saved');
+            setUserData(null)
+            setLoggedIn(false);
+          }
+          else {
+            setLoggedIn(true);
+            setUserData(response.data.responseData);
+            console.log("this is being aled- form")
+            navigate('/form');
+          }
+   
         }
       } catch (error) {
         console.error('No active session', error);
@@ -33,7 +47,7 @@ const App = () => {
     };
 
     checkUserSession();
-  }, [dispatch, navigate]);
+  }, [navigate, dispatch]);
 
 
   const handleLoginSuccess = (response) => {
@@ -51,8 +65,9 @@ const App = () => {
       <div>
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/saved" element={<ThankYouPage/>}/>
           <Route path="/login" element={<GoogleLoginButton onSuccess={handleLoginSuccess} onFailure={handleLoginFailure} />} />
-          <Route path="/form" element={<PrivateRoute isAuthenticated={loggedIn} element={() => <Form userData={userData} />} />} />
+          <Route path="/form" element={<PrivateRoute isAuthenticated={loggedIn} element={() => <Form user={userData} />} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

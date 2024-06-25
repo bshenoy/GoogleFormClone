@@ -3,12 +3,14 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/auth/authSlice';
 import axios from 'axios';
+import './GoogleLoginButton.css'; // Import custom CSS file for styles
 
 const GoogleLoginButton = ({ onSuccess, onFailure }) => {
   const dispatch = useDispatch();
 
   const handleLoginSuccess = async (tokenResponse) => {
     try {
+      // Fetch user info from Google API
       const userInfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: {
           Authorization: `Bearer ${tokenResponse.access_token}`,
@@ -16,6 +18,7 @@ const GoogleLoginButton = ({ onSuccess, onFailure }) => {
       });
       const userInfo = await userInfoResponse.json();
 
+      // Send user info to backend for authentication
       const response = await axios.post('http://localhost:5000/auth/google', {
         name: userInfo.name,
         email: userInfo.email,
@@ -23,7 +26,10 @@ const GoogleLoginButton = ({ onSuccess, onFailure }) => {
         withCredentials: true,
       });
 
+      // Dispatch action to store user info in Redux state
       dispatch(loginSuccess(userInfo));
+
+      // Call onSuccess callback provided by parent component
       onSuccess(userInfo);
     } catch (error) {
       console.error('Error fetching user info', error);
@@ -36,15 +42,22 @@ const GoogleLoginButton = ({ onSuccess, onFailure }) => {
     onFailure(error);
   };
 
+  // Use useGoogleLogin hook to initiate Google OAuth flow
   const login = useGoogleLogin({
     onSuccess: handleLoginSuccess,
     onError: handleLoginFailure,
   });
 
   return (
-    <button onClick={login}>
-      Login with Google
-    </button>
+    <div className="login-container">
+      <div className="login-content">
+        <h2>Welcome to the Quick Form Portal!</h2>
+        <p>Please log in using your Gmail ID to proceed with the application process.</p>
+        <button onClick={login} className="login-button">
+          Login with Google
+        </button>
+      </div>
+    </div>
   );
 };
 

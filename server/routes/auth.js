@@ -29,29 +29,33 @@ router.get('/check', async (req, res) => {
     try {
         // Find response data for the authenticated user
         const response = await Response.findOne({ userId: req.session.userId });
-        
+        const isSubmitted = await  User.findById(req.session.userId);
+       
         if (response) {
-            res.json({ authenticated: true, userId: req.session.userId, responseData: response.responses });
+            res.json({ authenticated: true, userId: req.session.userId, responseData: response.responses ,isSumbitted: isSubmitted.formSubmissionCompleted });
         } else {
-            res.json({ authenticated: true, userId: req.session.userId, responseData: null });
+            res.json({ authenticated: true, userId: req.session.userId, responseData: null , isSubmitted:false});
         }
     } catch (error) {
         console.error('Error fetching user response data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-router.get('/users/me', async (req, res) => {
+router.get('/user-details', async (req, res) => {
     if (!req.session.userId) {
-        return res.status(401).json({ error: 'User not authenticated' });
+      return res.status(401).json({ error: 'User not authenticated' });
     }
-
+  
     try {
-        const user = await User.findById(req.session.userId);
-        res.json({ user });
+      const user = await User.findById(req.session.userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      res.json({ email: user.email, name: user.name });
     } catch (error) {
-        console.error(error); // Logging the error
-        res.status(500).json({ error: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-});
+  });
 
 module.exports = router;

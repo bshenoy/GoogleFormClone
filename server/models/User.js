@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
     googleId: String,
     email: String,
     name: String,
+    formSubmissionCompleted: { type: Boolean, default: false } ,
     createdAt: { type: Date, default: Date.now },
 });
 
