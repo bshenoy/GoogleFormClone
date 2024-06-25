@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/auth/authSlice';
 import axios from 'axios';
 import './GoogleLoginButton.css'; // Import custom CSS file for styles
+import config from "../config/envConfig";
 
 const GoogleLoginButton = ({ onSuccess, onFailure }) => {
   const dispatch = useDispatch();
@@ -19,7 +20,7 @@ const GoogleLoginButton = ({ onSuccess, onFailure }) => {
       const userInfo = await userInfoResponse.json();
 
       // Send user info to backend for authentication
-      const response = await axios.post('http://localhost:5000/auth/google', {
+      const response = await axios.post(`${config.DOMAIN_URL}auth/google`, {
         name: userInfo.name,
         email: userInfo.email,
       }, {

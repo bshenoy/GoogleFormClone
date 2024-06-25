@@ -9,17 +9,18 @@ import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from './features/auth/authSlice'; // Update this path
 import ThankYouPage from './pages/Thank';
+import config from  "./config/envConfig.js";
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+console.log("url is ",`${config.DOMAIN_URL}auth/check` )
   useEffect(() => {
     const checkUserSession = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/auth/check', {
+        const response = await axios.get(`${config.DOMAIN_URL}auth/check`, {
           withCredentials: true
         });
 

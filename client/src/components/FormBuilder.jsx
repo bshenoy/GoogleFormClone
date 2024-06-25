@@ -22,6 +22,7 @@ import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../features/auth/authSlice';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'; // Import icon for upload button
 import { useNavigate } from 'react-router-dom';
+import config from "../config/envConfig";
 
 
 const formSections = [
@@ -237,7 +238,7 @@ const FormBuilder = () => {
   useEffect(() => {
     const fetchUserEmailName = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/auth/user-details', { withCredentials: true });
+        const response = await axios.get(`${config.DOMAIN_URL}auth/user-details`, { withCredentials: true });
         setUserEmailName({ email: response.data.email, name: response.data.name });
      
       } catch (error) {
@@ -319,7 +320,7 @@ const FormBuilder = () => {
     }, {});
 
     try {
-      const response = await axios.post('http://localhost:5000/api/save_response', {
+      const response = await axios.post(`${config.DOMAIN_URL}api/save_response`, {
         page: `page${currentPage + 1}`, // Adjusted to match backend page naming convention
         data: pageData
       }, { withCredentials: true });
@@ -379,11 +380,11 @@ const handleSubmit = async (e) => {
 
     if (saveResponse.status === 200) {
       try {
-        const response = await axios.get('http://localhost:5000/api/submit_form', { withCredentials: true });
+        const response = await axios.get(`${config.DOMAIN_URL}api/submit_form`, { withCredentials: true });
 
         if (response.data.message === 'Form submitted successfully') {
           navigate('/saved');
-          console.log("/saved being called");
+          // console.log("/saved being called");
         }
       } catch (error) {
         console.error('Error submitting form:', error);
