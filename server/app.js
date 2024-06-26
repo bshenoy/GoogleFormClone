@@ -1,5 +1,5 @@
 
-require('dotenv').config('');
+require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
@@ -11,14 +11,10 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-console.log('PORT:', config.PORT);
-console.log('MONGO_URL:', config.MONGO_URL);
-console.log('SESSION_SECRET:', config.SESSION_SECRET);
-console.log('FRONTEND_URL:', config.FRONTEND_URL);
 
 
 // Import database configuration
-const dbConfig = require('./config/dbConfig');
+const config = require('./config/dbConfig');
 
 // CORS Configuration
 const corsOptions = {
@@ -36,7 +32,7 @@ app.use(session({
     secret: 'secret56555',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: dbConfig.DB_CONFIG }),
+    store: MongoStore.create({ mongoUrl: config.MONGO_URL }), 
     cookie: {
         maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
         sameSite: 'lax', // Adjust as necessary based on your security requirements
@@ -45,7 +41,7 @@ app.use(session({
 }));
 
 // Connect to MongoDB
-mongoose.connect(dbConfig.DB_CONFIG , { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(config.MONGO_URL , { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 
