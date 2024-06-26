@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
@@ -6,15 +8,18 @@ const MongoStore = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const config = require('./config/dbConfig');
+// Load environment variables from .env file
+console.log('PORT:', config.PORT);
+console.log('MONGO_URL:', config.MONGO_URL);
+console.log('SESSION_SECRET:', config.SESSION_SECRET);
+console.log('FRONTEND_URL:', config.FRONTEND_URL);
 
 const app = express();
 
-// Import database configuration
-const dbConfig = require('./config/dbConfig');
-
 // CORS Configuration
 const corsOptions = {
-    origin: process.env.FRONTEND_URL || 'http://localhost', // Replace with your frontend URL
+    origin: config.FRONTEND_URL || 'http://localhost', // Replace with your frontend URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Allow credentials (cookies, sessions, etc.)
     optionsSuccessStatus: 204 // Some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -25,19 +30,19 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 app.use(cookieParser());
 app.use(session({
-    secret: 'secret56555',
+    secret: config.SESSION_SECRET || 'defaultsecret',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: dbConfig.DB_CONFIG || 'mongodb://localhost:27017/userDb' }),
+    store: MongoStore.create({ mongoUrl: config.MONGO_URL }),
     cookie: {
         maxAge: 14 * 24 * 60 * 60 * 1000, // 14 days
         sameSite: 'lax', // Adjust as necessary based on your security requirements
-        secure: false, // Set to true if using HTTPS
+        secure: 'true', // Set to true if using HTTPS
     }
 }));
 
 // Connect to MongoDB
-mongoose.connect(dbConfig.DB_CONFIG, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(config.MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 
@@ -69,7 +74,7 @@ app.get('*', (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = config.PORT;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
