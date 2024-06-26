@@ -46,7 +46,7 @@ mongoose.connect(config.MONGO_URL , { useNewUrlParser: true, useUnifiedTopology:
     .catch(err => console.log(err));
 
 // Serve static files from the React app's build directory
-app.use(express.static(path.join(__dirname, '../client/build')));
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 // API Routes
 app.use('/auth', require('./routes/auth'));
@@ -63,14 +63,14 @@ app.use((req, res, next) => {
         res.header('Expires', '-1');
         res.header('Pragma', 'no-cache');
         // Serve the index.html file
-        res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
     }
 });
 
-// Serve the index.html file for any other request (handle client-side routing)
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
+// // Serve the index.html file for any other request (handle client-side routing)
+// app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+// });
 
 // Start server
 const PORT = process.env.PORT || 3000;
